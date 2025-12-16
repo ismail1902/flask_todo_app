@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask Todo App</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: #5a67d8;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .flash-messages { padding: 0 30px; }
+        .flash {
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            font-weight: 500;
+        }
+        .flash.success {
+            background: #c6f6d5;
+            color: #22543d;
+            border-left: 4px solid #38a169;
+        }
+        .flash.error {
+            background: #fed7d7;
+            color: #742a2a;
+            border-left: 4px solid #e53e3e;
+        }
+        .add-todo {
+            padding: 30px;
+            background: #f7fafc;
+        }
+        .todo-form { display: flex; gap: 10px; }
+        .todo-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary { background: #5a67d8; color: white; }
+        .btn-primary:hover { background: #4c51bf; }
+        .todo-list { padding: 20px 30px 30px; }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f7fafc;
+            border-radius: 5px;
+            border: 1px solid #e2e8f0;
+        }
+        .todo-item.completed { opacity: 0.6; }
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            color: #718096;
+        }
+        .todo-text { flex: 1; font-size: 1.1em; color: #2d3748; }
+        .todo-actions { display: flex; gap: 8px; }
+        .btn-small { padding: 6px 12px; font-size: 0.9em; }
+        .btn-success { background: #48bb78; color: white; }
+        .btn-success:hover { background: #38a169; }
+        .btn-warning { background: #ed8936; color: white; }
+        .btn-warning:hover { background: #dd6b20; }
+        .btn-danger { background: #f56565; color: white; }
+        .btn-danger:hover { background: #e53e3e; }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 My Todo List</h1>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <div class="add-todo">
+            <form action="/add" method="post" class="todo-form">
+                <input type="text" name="title" class="todo-input" placeholder="What needs to be done?" required>
+                <button type="submit" class="btn btn-primary">Add Todo</button>
+            </form>
+        </div>
+        
+        <div class="todo-list">
+            {% if todos %}
+                {% for todo in todos %}
+                    <div class="todo-item {% if todo.completed %}completed{% endif %}">
+                        <span class="todo-text">{{ todo.title }}</span>
+                        <div class="todo-actions">
+                            <a href="{{ url_for('complete_todo', todo_id=todo.id) }}" 
+                               class="btn btn-small btn-success">
+                                {% if todo.completed %}Undo{% else %}✓{% endif %}
+                            </a>
+                            <a href="{{ url_for('edit_todo', todo_id=todo.id) }}" 
+                               class="btn btn-small btn-warning">
+                                Edit
+                            </a>
+                            <a href="{{ url_for('delete_todo', todo_id=todo.id) }}" 
+                               class="btn btn-small btn-danger"
+                               onclick="return confirm('Are you sure?')">
+                                Delete
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <h3>No todos yet!</h3>
+                    <p>Add your first todo above.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
