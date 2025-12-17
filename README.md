@@ -118,7 +118,7 @@ This will install:
 Start the Flask development server:
 
 ```bash
-python app.py
+python3 app.py
 ```
 
 You should see output similar to:
